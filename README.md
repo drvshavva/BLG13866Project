@@ -1,6 +1,23 @@
 # MCM: Masked Cell Modeling for Anomaly Detection In Tabular Data
 
-This code is the official implementation of the paper: [MCM: Masked Cell Modeling for Anomaly Detection in Tabular Data](https://openreview.net/forum?id=lNZJyEDxy4) published at ICLR 2024 as a conference paper by Jiaxin Yin, Yuanyuan Qiao, Zitang Zhou, Xiangchao Wang, and Jie Yang. The code allows the users to reproduce and extend the results reported in the study. Please cite the above paper when reporting, reproducing or extending the results.
+This repository contains the Python implementation of the MCM paper: [MCM: Masked Cell Modeling for Anomaly Detection in Tabular Data](https://openreview.net/forum?id=lNZJyEDxy4) published at ICLR 2024 as a conference paper.
+
+**Core Idea**
+
+* Adapting the Masked Image/Language Modeling (MIM/MLM) approach to tabular data
+* Detecting anomalies by learning the correlations among normal samples
+* Using multiple masks to capture diverse types of correlations
+
+**Architecture**
+
+* Mask Generator: Produces learnable masks from the input data
+* Encoder: Encodes the masked data into a latent space
+* Decoder: Reconstructs the original data from the latent representation
+
+**Loss Functions**
+
+* Reconstruction Loss: Minimizes the reconstruction error
+* Diversity Loss: Encourages diversity among different masks
 
 
 ## Prepare dataset

@@ -1,3 +1,15 @@
 epochs: 200 lr: 0.0500 gamma: 0.98 masks: 15 lambda: 5.0 
 de_layer: 3  hidden_dim: 256 z_dim: 128 mask_layer: 3
 mse: average AUC-ROC: 0.9814  average AUC-PR: 0.8887 average f1: 0.7273
+
+======================================================================
+Timestamp: 2025-11-23T19:12:12.778383
+epochs: 200 lr: 0.0500 gamma: 0.98 masks: 15 lambda: 5.0
+de_layers: 3 hidden_dim: 256 z_dim: 128 mask_layers: 3
+AUC-ROC: 0.9816 ± 0.0000 AUC-PR: 0.8810 ± 0.0000 F1: 0.7317 ± 0.0000
+
+======================================================================
+Timestamp: 2025-11-23T20:00:48.849525
+epochs: 200 lr: 0.0500 gamma: 0.98 masks: 15 lambda: 5.0
+de_layers: 3 hidden_dim: 256 z_dim: 128 mask_layers: 3
+AUC-ROC: 0.9816 ± 0.0000 AUC-PR: 0.8810 ± 0.0000 F1: 0.7317 ± 0.0000
