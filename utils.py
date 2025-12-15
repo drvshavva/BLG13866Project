@@ -284,3 +284,20 @@ def setup_logger(
     logger.addHandler(console_handler)
 
     return logger
+
+def infer_input_dim(loader, fallback=None):
+    """Dataloader veya dataset'ten güvenli şekilde input_dim çıkarır; başarısızsa fallback döner."""
+    try:
+        batch = next(iter(loader))
+        x = batch[0] if isinstance(batch, (list, tuple)) else batch
+        return int(x.shape[1])
+    except Exception:
+        ds = getattr(loader, "dataset", None)
+        if ds is not None:
+            if hasattr(ds, "tensors") and len(ds.tensors) > 0:
+                return int(ds.tensors[0].shape[1])
+            if hasattr(ds, "data"):
+                return int(ds.data.shape[1])
+    if fallback is not None:
+        return int(fallback)
+    raise RuntimeError("input_dim çıkarılamadı: dataloader/dataset kontrol edin")
