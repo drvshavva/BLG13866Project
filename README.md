@@ -2,40 +2,36 @@
 
 This repository contains the Python implementation of the MCM paper: [MCM: Masked Cell Modeling for Anomaly Detection in Tabular Data](https://openreview.net/forum?id=lNZJyEDxy4) published at ICLR 2024 as a conference paper.
 
-**Core Idea**
+**Paper:** "MCM: Masked Cell Modeling for Anomaly Detection in Tabular Data"  
+**Authors:** Jiaxin Yin, Yuanyuan Qiao, Zitang Zhou, Xiangchao Wang, Jie Yang  
+**Venue:** ICLR 2024
 
-* Adapting the Masked Image/Language Modeling (MIM/MLM) approach to tabular data
-* Detecting anomalies by learning the correlations among normal samples
-* Using multiple masks to capture diverse types of correlations
+## What is MCM?
+MCM (Masked Cell Modeling) is a self-supervised learning method designed for anomaly detection on tabular data.
 
-**Architecture**
+## Core idea
+- Bring the success of MAE (Masked Autoencoder) from computer vision and
+- BERT (Masked Language Modeling) from NLP into tabular anomaly detection
 
-* Mask Generator: Produces learnable masks from the input data
-* Encoder: Encodes the masked data into a latent space
-* Decoder: Reconstructs the original data from the latent representation
+## How it works
+1. Learn the correlations among normal data
+   - If Feature A is high → Feature B should also be high
+   - These correlations represent "normal behavior" patterns
+2. At test time detect deviations from these correlations
+   - Anomalies do not follow these correlations
+   - Reconstruction error → anomaly score
 
-**Loss Functions**
+## Key innovations
+1. Learnable Masking — learn masks with a neural network instead of random masking
+2. Multiple Masks — use K different masks (default K = 15)
+3. Diversity Loss — encourage masks to be different from each other
 
-* Reconstruction Loss: Minimizes the reconstruction error
-* Diversity Loss: Encourages diversity among different masks
+## Mathematical formulation
 
+**Toplam Loss:** $\mathcal{L} = \mathcal{L}_{rec} + \lambda \cdot \mathcal{L}_{div}$
 
-## Prepare dataset
-   1) When using your own data, move the dataset into `./Data`. 
-   2) Add the dataset name to `./Dataset/DataLoader.py` based on the format of your dataset.
-   3) Modify *dataset_name* and *data_dim* in `./main.py`
-   4) You can download tabular datasets from [ODDS](https://odds.cs.stonybrook.edu/) and [ADBench](https://github.com/Minqi824/ADBench) for testing.
+**Reconstruction Loss:** $\mathcal{L}_{rec} = \frac{1}{K} \sum_{k=1}^{K} ||\hat{X}_k - X||^2$
 
-## Run
-Run `main.py` to start training and testing the model. Results will be automatically stored in `./results`.
+**Diversity Loss:** $\mathcal{L}_{div} = \sum_{i=1}^{K} \left[ \ln \left( \sum_{j=1}^{K} e^{<M_i, M_j>/\tau} \cdot \mathbb{1}_{i \neq j} \right) \cdot scale \right]$
 
-
-## Requirements
-```
-- Python 3.6
-- PyTorch 1.10.2
-- torchvision 0.11.3
-- numpy 1.23.5
-- pandas 1.5.3
-- scipy 1.10.1
-```
+**Anomaly Score:** $score(x) = \frac{1}{K} \sum_{k=1}^{K} ||D(E(x \odot M_k)) - x||^2$
