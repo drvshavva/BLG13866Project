@@ -64,26 +64,27 @@ def extract_xy_from_loader(loader):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Mask count sensitivity experiment for MCM on one dataset')
-    parser.add_argument('--dataset', type=str, default='glass', help='dataset name as in DATASET_CONFIGS')
-    parser.add_argument('--epochs', type=int, default=80, help='number of training epochs')
-    parser.add_argument('--batch_size', type=int, default=None, help='override batch size')
-    parser.add_argument('--out', type=str, default='./results', help='output directory')
-
-    args = parser.parse_args()
-
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f'Using device: {device}')
-
-    dataset = args.dataset.lower()
+    args= {
+        'dataset': 'pendigits',
+        'data_dim': 16,
+        'hidden_dim': 128,
+        'z_dim': 64,
+        'mask_num': 10,
+        'learning_rate': 0.05,
+        'batch_size': 512,
+        'epochs': 200,
+    }
+    dataset = 'thyroid'
     config = {
         'dataset_name': dataset,
         'data_dir': './datasets'
     }
     # load dataset specific config if present
     config.update(DATASET_CONFIGS.get(dataset, {}))
-    if args.batch_size is not None:
-        config['batch_size'] = args.batch_size
+    if args['batch_size'] is not None:
+        config['batch_size'] = args['batch_size']
 
     # dataloaders
     print(f'Loading dataset: {dataset.upper()}')
@@ -120,7 +121,7 @@ if __name__ == '__main__':
         initialize_weights(model)
         trainer = MCMTrainer(model, learning_rate=config.get('learning_rate', 1e-3), device=device)
 
-        trainer.train(train_loader, num_epochs=args.epochs, verbose=False)
+        trainer.train(train_loader, num_epochs=args['epochs'], verbose=False)
 
         try:
             auc_roc, auc_pr = trainer.evaluate(X_test_t, y_test_t)
@@ -133,15 +134,13 @@ if __name__ == '__main__':
 
     df_masks = pd.DataFrame(results_masks)
 
-    os.makedirs(args.out, exist_ok=True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    csv_path = os.path.join(args.out, f'mask_sensitivity_{dataset}_{timestamp}.csv')
+    csv_path = os.path.join(".", f'mask_sensitivity_{dataset}_{timestamp}.csv')
     df_masks.to_csv(csv_path, index=False)
     try:
-        df_masks.to_excel(os.path.join(args.out, f'mask_sensitivity_{dataset}_{timestamp}.xlsx'), index=False)
+        df_masks.to_excel(os.path.join(".", f'mask_sensitivity_{dataset}_{timestamp}.xlsx'), index=False)
     except Exception:
         pass
 
     print('Results saved to:', csv_path)
     print(df_masks.to_string(index=False))
-
