@@ -26,14 +26,22 @@ class MCMTrainer:
         lr_decay: float = 0.99,
         device: str = 'cuda' if torch.cuda.is_available() else 'cpu'
     ):
+        if hasattr(model, 'use_attention_mask') and model.use_attention_mask:
+            self.optimizer = torch.optim.Adam([
+                {'params': model.mask_generator.attention.parameters(), 'lr': learning_rate * 0.1},
+                {'params': model.mask_generator.mask_networks.parameters(), 'lr': learning_rate},
+                {'params': model.encoder.parameters(), 'lr': learning_rate},
+                {'params': model.decoder.parameters(), 'lr': learning_rate}
+            ])
+        else:
+            self.optimizer = optim.Adam(
+                model.parameters(),
+                lr=learning_rate,
+                weight_decay=weight_decay
+            )
+
         self.model = model.to(device)
         self.device = device
-
-        self.optimizer = optim.Adam(
-            model.parameters(),
-            lr=learning_rate,
-            weight_decay=weight_decay
-        )
 
         self.scheduler = optim.lr_scheduler.ExponentialLR(
             self.optimizer,

@@ -5,7 +5,7 @@ from typing import Tuple, List, Optional
 
 from .encoder_decoder import Encoder, Decoder
 from .mask_generator import MaskGenerator
-
+from .attention_mask import AttentionMaskGenerator
 
 class MCM(nn.Module):
     """
@@ -39,17 +39,28 @@ class MCM(nn.Module):
             latent_dim: int = 128,
             num_masks: int = 15,
             temperature: float = 0.1,
-            lambda_div: float = 20.0
-    ):
+            lambda_div: float = 20.0,
+            use_attention_mask=False,
+            n_heads=4):
         super(MCM, self).__init__()
 
         self.input_dim = input_dim
         self.num_masks = num_masks
         self.temperature = temperature
         self.lambda_div = lambda_div
+        self.use_attention_mask = use_attention_mask
 
         # Model components
-        self.mask_generator = MaskGenerator(input_dim, hidden_dim, num_masks)
+        if use_attention_mask:
+            self.mask_generator = AttentionMaskGenerator(
+                input_dim=input_dim,
+                n_masks=num_masks,
+                n_heads=n_heads,
+                hidden_dim=256
+            )
+        else:
+            self.mask_generator = MaskGenerator(input_dim, hidden_dim, num_masks)
+
         self.encoder = Encoder(input_dim, hidden_dim, latent_dim)
         self.decoder = Decoder(latent_dim, hidden_dim, input_dim)
 
