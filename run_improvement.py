@@ -228,6 +228,7 @@ def main():
     # ==========================================
     # MODEL 2: Attention-Based MCM
     # ==========================================
+    # n_heads None olarak verilirse otomatik hesaplanır
     model_attention = MCM(
         input_dim=input_dim,
         hidden_dim=hidden_dim,
@@ -235,7 +236,7 @@ def main():
         num_masks=num_masks,
         lambda_div=10.0,
         use_attention_mask=True,  # NEW: Attention-based masks
-        n_heads=4  # Number of attention heads
+        n_heads=None  # Auto-adjust based on input_dim
     )
 
     result_attention = train_and_evaluate(
@@ -250,6 +251,9 @@ def main():
     )
     all_results.append(result_attention)
 
+    # ==========================================
+    # COMPARISON SUMMARY
+    # ==========================================
     print("\n" + "=" * 70)
     print("COMPARISON SUMMARY")
     print("=" * 70)
@@ -285,6 +289,10 @@ def main():
         print("\n⚠ Attention-based method shows mixed results.")
     else:
         print("\n✗ Baseline method performed better.")
+
+    # ==========================================
+    # SAVE RESULTS
+    # ==========================================
     output_dir = './results'
     os.makedirs(output_dir, exist_ok=True)
 
@@ -330,6 +338,10 @@ def main():
         f.write(f"  - Parameters: {sum(p.numel() for p in model_attention.parameters()):,}\n")
 
     print(f"Detailed report saved to: {report_path}")
+
+    # ==========================================
+    # VISUALIZATION
+    # ==========================================
     try:
         plot_comparison(all_results, dataset_name, output_dir)
     except Exception as e:
